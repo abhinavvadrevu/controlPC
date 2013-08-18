@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<html lang="en">
+<head style="padding:0px; margin:0px;">
+    <title>ControlPC</title>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+	<script type="text/javascript">
+	
+	var mie;
+	var click = true;
+	
+	var imageHeight;
+	var imageWidth;
+
+	var windowHeight;
+	var windowWidth;
+	
+	var controleeHeight;
+	var controleeWidth;
+	
+	var x = 0;
+	var y = 0;
+	
+	
+	
+	function clickme() {
+		click = false;
+			var xmlhttp;
+			if (window.XMLHttpRequest)
+			  {// code for IE7+, Firefox, Chrome, Opera, Safari
+			  xmlhttp=new XMLHttpRequest();
+			  }
+			else
+			  {// code for IE6, IE5
+			  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+			  }
+			xmlhttp.onreadystatechange=function()
+			  {
+			  if (xmlhttp.readyState==4 && xmlhttp.status==200)
+				{
+				//document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
+			    }
+			  }
+		  xmlhttp.open("GET","/doubler?x=" + x + "&y="+ y + "&c=true",true);
+		  xmlhttp.send();
+		  click=true;
+	}
+	
+	
+	function callOnLoad() {
+		mie = (navigator.appName == "Microsoft Internet Explorer") ? true : false;
+		getMouseCoordinates();		// start updating mouse coordinates
+		getDimensions();		    // get controllers window dimensions
+		
+		// set controller's browser width and height to display image correctly
+		imageWidth=1000;
+		imageHeight=562;
+		
+		setInterval(function() {sendCoordinates() },100);
+		setInterval(function() {retreiveImage() },100);
+		
+		function retreiveImage() {
+			var xmlhttp;
+			if (window.XMLHttpRequest)
+			  {// code for IE7+, Firefox, Chrome, Opera, Safari
+			  xmlhttp=new XMLHttpRequest();
+			  }
+			else
+			  {// code for IE6, IE5
+			  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+			  }
+			xmlhttp.onreadystatechange=function()
+			  {
+			  if (xmlhttp.readyState==4 && xmlhttp.status==200)
+				{
+				document.getElementById("myDiv").innerHTML= '<img onclick="clickme()" style="height:'+imageHeight+'px; width:'+imageWidth+'px;" src="data:image/gif;base64,' + xmlhttp.responseText + '"/>';
+				
+			    }
+			  }
+		  xmlhttp.open("GET","/getimage",true);
+		  xmlhttp.send();
+		}
+		
+		function sendCoordinates() {
+			// send coordinates
+			var xmlhttp;
+				if (window.XMLHttpRequest)
+				  {// code for IE7+, Firefox, Chrome, Opera, Safari
+				  xmlhttp=new XMLHttpRequest();
+				  }
+				else
+				  {// code for IE6, IE5
+				  xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+				  }
+				xmlhttp.onreadystatechange=function()
+				  {
+				  if (xmlhttp.readyState==4 && xmlhttp.status==200)
+					{
+					//document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
+				    }
+				  }
+			  xmlhttp.open("GET","/doubler?x=" + x + "&y="+ y + "&c=false",true);
+			  xmlhttp.send();
+		}
+	}
+	
+	function getMouseCoordinates() {
+		if (!mie) {
+			 document.captureEvents(Event.MOUSEMOVE);
+		}
+		document.onmousemove = function (e) {mousePos(e);};
+		function mousePos (e) {
+			if (!mie) {
+				x = Math.round(e.pageX*1366/imageWidth);
+				y = Math.round(e.pageY*768/imageHeight);
+			}
+			else {
+				x = Math.round((event.clientX + document.body.scrollLeft)*1366/imageWidth);
+				y = Math.round((event.clientY + document.body.scrollTop)*768/imageHeight);
+			}
+			document.getElementById("status").innerHTML = x + ", " + y;  // update screen
+		};
+	};
+	
+	
+	function getDimensions() {  // Returns a tuple (width,height) of the browsers width and height
+
+		if( typeof( window.innerWidth ) == 'number' ) {
+
+		//Non-IE 
+
+		windowWidth = window.innerWidth;
+		windowHeight = window.innerHeight; 
+
+		} else if( document.documentElement && 
+
+		( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
+
+		//IE 6+ in 'standards compliant mode' 
+
+		windowWidth = document.documentElement.clientWidth; 
+		windowHeight = document.documentElement.clientHeight; 
+
+		} else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+
+		//IE 4 compatible 
+
+		windowWidth = document.body.clientWidth; 
+		windowHeight = document.body.clientHeight;
+		}
+		return (windowWidth, windowHeight);
+	}
+	
+	</script>
+</head>
+<div style="top:0px; padding:0px; margin:0px; position: absolute; background-color:pink; height:100%; width:100%;z-index:-1" onclick="clickme()">
+</div>
+<body onload="callOnLoad()"; style="padding:0px; margin:0px;">
+
+<div id="myDiv">
+</div>
+
+<h1 id="status">
+</h1>
+
+</body>
+</html>
