@@ -9,7 +9,6 @@ This project was an idea at a Hackathon.  I wrote the whole thing myself in abou
 On the computer being controlled, use:
 
 py serverend.py
-
 py compend.py
 
 Then navigate to the broadcast url on the controlling computer to control the mouse.
